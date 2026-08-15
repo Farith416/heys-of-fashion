@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Admin Dashboard</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+	</head>
+	<body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+
+        <div class="flash-container">
+
+            {% for category, message in messages %}
+
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+        {% endwith %}
+		<div class="form-box">
+            <div class="admin-header">
+                <div>
+                    <h1>🛍 Add New Product</h1>
+                    <p>Upload new dresses and manage inventory.</p>
+                </div>
+                <a href="/" class="home-btn">
+                    🏠 Back Home
+                </a> 
+           </div>
+			<form method="POST" enctype="multipart/form-data">
+				<input name="name" placeholder="Product Name" required>
+				<input name="category" placeholder="Category" required>
+				<input name="price" placeholder="Price" required>
+				<input name="stock" placeholder="Available Stock" required>
+				<input name="sizes" placeholder="Sizes (S,M,L,XL)" required>
+				<input name="pack" placeholder="Pieces Per Pack" required>
+				<textarea name="description" placeholder="Description"></textarea>
+                <label>Upload Product Images</label>
+                <input
+                    type="file"
+                    id="imageInput"
+                    name="images"
+                    multiple
+                    required>
+                <div id="preview-container"></div>
+    			<button type="submit"> Add Product </button>
+			</form>
+		</div>
+        <script>
+            document
+            .getElementById("imageInput")
+            .addEventListener("change", function(){
+
+                let container =
+                    document.getElementById(
+                        "preview-container"
+                    );
+
+                container.innerHTML = "";
+
+                Array.from(this.files).forEach(file => {
+
+                    let reader = new FileReader();
+
+                    reader.onload = function(e){
+
+                        let img =
+                            document.createElement("img");
+
+                        img.src = e.target.result;
+
+                        img.style.width = "120px";
+                        img.style.margin = "5px";
+                        img.style.borderRadius = "10px";
+
+                        container.appendChild(img);
+                    };
+
+                    reader.readAsDataURL(file);
+
+                });
+
+            });
+
+            setTimeout(function(){
+
+                let alerts =
+                    document.querySelectorAll(".flash");
+
+                alerts.forEach(function(alert){
+
+                    alert.style.transition = "0.5s";
+                    alert.style.opacity = "0";
+
+                    setTimeout(function(){
+                        alert.remove();
+                    },500);
+
+                });
+
+            },3000);
+
+        </script>
+	</body>
+</html>
