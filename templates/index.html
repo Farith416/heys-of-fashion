@@ -1,160 +1,459 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<title>Heys Of Fashion</title>
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-	</head>
-	<body>
-	{% with messages = get_flashed_messages(with_categories=true) %}
-	{% if messages %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Heys Of Fashion</title>
 
-	<div class="flash-container">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
 
-		{% for category, message in messages %}
+<body>
 
-		<div class="flash {{ category }}">
-			{{ message }}
-		</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
 
-		{% endfor %}
+<div class="flash-container">
 
-	</div>
+    {% for category, message in messages %}
 
-	{% endif %}
-	{% endwith %}
-    <nav class="navbar">
-        <div class="logo">
-            Heys Of Fashion
+    <div class="flash {{ category }}">
+        {{ message }}
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+{% endwith %}
+
+
+<!-- NAVBAR -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        Heys Of Fashion
+    </div>
+
+    <div class="nav-links">
+
+        {% if session.get('admin') %}
+
+        <a href="/admin">Add Product</a>
+
+        <a href="/logout" class="logout-btn">
+            Logout
+        </a>
+
+        {% else %}
+
+        <a href="/login">
+            Admin Login
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <h1>Exclusive Collection</h1>
+
+    <p>
+        Premium Fashion For Every Woman
+    </p>
+
+    <a href="#products" class="hero-btn">
+        Shop Now
+    </a>
+
+</section>
+
+
+<!-- SEARCH -->
+
+<div class="search-box">
+
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="Search Dresses..."
+        onkeyup="searchProducts()"
+    >
+
+</div>
+
+
+<!-- FILTERS -->
+
+<div class="filters">
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('all')">
+        All
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('Saree')">
+        Saree
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('Kurti')">
+        Kurti
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('Lehenga')">
+        Lehenga
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('Gown')">
+        Gown
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('Leggings')">
+        Leggings
+    </button>
+
+    <button
+        class="filter-btn"
+        onclick="filterProducts('Dupatta')">
+        Dupatta
+    </button>
+
+</div>
+
+
+<!-- PRODUCTS -->
+
+<h2 class="title" id="products">
+    Latest Collection
+</h2>
+
+
+<div class="products">
+
+{% for item in products %}
+
+{% set p = item.product %}
+
+
+<div
+    class="card product-card"
+    data-category="{{ p.category }}"
+>
+
+
+    <!-- PRODUCT IMAGES -->
+
+    <div class="product-gallery">
+
+        {% for img in item.images %}
+
+        <img
+            class="zoomable"
+            src="{{ img }}"
+            alt="{{ p.name }}"
+        >
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- PRODUCT INFORMATION -->
+
+    <div class="info">
+
+        <span class="badge">
+            {{ p.category }}
+        </span>
+
+
+        <h3>
+            {{ p.name }}
+        </h3>
+
+
+        <div class="price">
+            ₹{{ p.price }}
         </div>
-		<div class="nav-links">
-			{% if session.get('admin') %}
-			<a href="/admin">Add Product</a>
-			<a href="/logout" class="logout-btn">
-				Logout
-			</a>
-			{% else %}
-			<a href="/login">Admin Login</a>
-			{% endif %}
-		</div>
-    </nav>
-		<section class="hero">
-			<h1>Exclusive Collection</h1>
-			<p>Premium Fashion For Every Woman</p>
-			<a href="#products" class="hero-btn">Shop Now</a>
-		</section>
-		<div class="search-box">
-			<input type="text" id="searchInput" placeholder="Search Dresses..." onkeyup="searchProducts()">
-		</div>
-		<div class="filters">
-			<button class="filter-btn" onclick="filterProducts('all')">All</button>
-			<button class="filter-btn" onclick="filterProducts('Saree')">Saree</button>
-			<button class="filter-btn" onclick="filterProducts('Kurti')">Kurti</button>
-			<button class="filter-btn" onclick="filterProducts('Lehenga')">Lehenga</button>
-			<button class="filter-btn" onclick="filterProducts('Gown')">Gown</button>
-			<button class="filter-btn" onclick="filterProducts('Gown')">Leggings</button>
-			<button class="filter-btn" onclick="filterProducts('Gown')">Dupatta</button>
-		</div>
-		<h2 class="title" id="products">Latest Collection</h2>
-		<div class="products">{% for item in products %} {% set p = item.product %} <div class="card product-card" data-category="{{ p[2] }}">
-				<div class="product-gallery">
-				{% for img in item.images %}
-				<img class="zoomable"
-					src="{{ url_for('static', filename='uploads/' + img[0]) }}"
-					alt="{{ p[1] }}">
-				{% endfor %}
-				</div>
-				<div class="info">
-					<span class="badge">{{ p[2] }}</span>
-					<h3>{{ p[1] }}</h3>	
-					<div class="price">₹{{ p[3] }}</div>
-					<p>
-						<b>Sizes:</b> {{ p[5] }}
-					</p>
-					<p>
-						<b>Pack:</b> {{ p[6] }}
-					</p>
-					<p>
-						<b>Stock:</b> {{ p[4] }}
-					</p>
 
-					{% if p[4]|int > 5 %}
-					<p class="stock-good">✅ In Stock</p>
 
-					{% elif p[4]|int > 0 %}
-					<p class="stock-low">⚠️ Low Stock</p>
+        <p>
+            <b>Sizes:</b>
+            {{ p.sizes }}
+        </p>
 
-					{% else %}
-					<p class="stock-out">❌ Out Of Stock</p>
-					{% endif %}
 
-					<p>{{ p[7] }}</p>
-					<a class="whatsapp"
-						target="_blank"
-						href="https://wa.me/919080007311?text=Interested%20in%20{{ p[1] }}">
-						WhatsApp Order
-					</a>
-					</a>{% if session.get('admin') %} <a href="/edit/{{ p[0] }}" class="edit-btn"> Edit</a><a href="/delete/{{ p[0] }}" class="delete-btn" onclick="return confirm('Delete this product?')"> Delete </a>{% endif %}
-				</div>
-			</div>{% endfor %} </div>
-		<footer class="footer">
-			<h2>Heys Of Fashion</h2>
-			<p>Cuddalore, Tamilnadu</p>
-		</footer>
-		<a href="https://wa.me/919080007311"
-			class="floating-whatsapp"
-			target="_blank">
-			💬
-		</a>
-		<div id="imageModal" class="image-modal">
-			<span class="close-modal">&times;</span>
-			<img id="modalImage">
-		</div>
-		<script>
-			function searchProducts() {
-				let i = document.getElementById('searchInput').value.toLowerCase();
-				document.querySelectorAll('.product-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(i) ? 'block' : 'none')
-			}
+        <p>
+            <b>Pack:</b>
+            {{ p.pack }}
+        </p>
 
-			function filterProducts(cat) {
-				document.querySelectorAll('.product-card').forEach(c => c.style.display = (cat === 'all' || c.dataset.category.toLowerCase() === cat.toLowerCase()) ? 'block' : 'none')
-			}
-			setTimeout(function() {
 
-				let alerts = document.querySelectorAll(".flash");
+        <p>
+            <b>Stock:</b>
+            {{ p.stock }}
+        </p>
 
-				alerts.forEach(function(alert){
 
-					alert.style.transition = "0.5s";
-					alert.style.opacity = "0";
+        <!-- STOCK STATUS -->
 
-					setTimeout(function(){
-						alert.remove();
-					}, 500);
+        {% if p.stock|int > 5 %}
 
-				});
+        <p class="stock-good">
+            ✅ In Stock
+        </p>
 
-			}, 3000);   // disappears after 3 seconds
+        {% elif p.stock|int > 0 %}
 
-			document.querySelectorAll(".zoomable").forEach(img => {
+        <p class="stock-low">
+            ⚠️ Low Stock
+        </p>
 
-				img.addEventListener("click", function(){
+        {% else %}
 
-					document.getElementById("imageModal").style.display = "block";
+        <p class="stock-out">
+            ❌ Out Of Stock
+        </p>
 
-					document.getElementById("modalImage").src = this.src;
+        {% endif %}
 
-				});
 
-			});
+        <!-- DESCRIPTION -->
 
-			document.querySelector(".close-modal")
-			.addEventListener("click", function(){
+        <p>
+            {{ p.description }}
+        </p>
 
-				document.getElementById("imageModal").style.display = "none";
 
-			});
-		</script>
-	</body>
+        <!-- WHATSAPP -->
+
+        <a
+            class="whatsapp"
+            target="_blank"
+            href="https://wa.me/919080007311?text=Interested%20in%20{{ p.name }}"
+        >
+            WhatsApp Order
+        </a>
+
+
+        <!-- ADMIN ACTIONS -->
+
+        {% if session.get('admin') %}
+
+        <a
+            href="/edit/{{ p.id }}"
+            class="edit-btn">
+            Edit
+        </a>
+
+
+        <a
+            href="/delete/{{ p.id }}"
+            class="delete-btn"
+            onclick="return confirm('Delete this product?')"
+        >
+            Delete
+        </a>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+    <h2>
+        Heys Of Fashion
+    </h2>
+
+    <p>
+        Cuddalore, Tamilnadu
+    </p>
+
+</footer>
+
+
+<!-- FLOATING WHATSAPP -->
+
+<a
+    href="https://wa.me/919080007311"
+    class="floating-whatsapp"
+    target="_blank"
+>
+    💬
+</a>
+
+
+<!-- IMAGE MODAL -->
+
+<div id="imageModal" class="image-modal">
+
+    <span class="close-modal">
+        &times;
+    </span>
+
+    <img id="modalImage">
+
+</div>
+
+
+<script>
+
+
+/* =========================
+   SEARCH PRODUCTS
+========================= */
+
+function searchProducts() {
+
+    let input =
+        document
+        .getElementById('searchInput')
+        .value
+        .toLowerCase();
+
+
+    document
+    .querySelectorAll('.product-card')
+    .forEach(card => {
+
+        card.style.display =
+            card.innerText
+            .toLowerCase()
+            .includes(input)
+            ? 'block'
+            : 'none';
+
+    });
+
+}
+
+
+/* =========================
+   FILTER PRODUCTS
+========================= */
+
+function filterProducts(category) {
+
+    document
+    .querySelectorAll('.product-card')
+    .forEach(card => {
+
+        let productCategory =
+            card.dataset.category.toLowerCase();
+
+
+        card.style.display =
+            (
+                category === 'all' ||
+                productCategory === category.toLowerCase()
+            )
+            ? 'block'
+            : 'none';
+
+    });
+
+}
+
+
+/* =========================
+   FLASH MESSAGE
+========================= */
+
+setTimeout(function() {
+
+    let alerts =
+        document.querySelectorAll(".flash");
+
+
+    alerts.forEach(function(alert) {
+
+        alert.style.transition = "0.5s";
+
+        alert.style.opacity = "0";
+
+
+        setTimeout(function() {
+
+            alert.remove();
+
+        }, 500);
+
+    });
+
+}, 3000);
+
+
+/* =========================
+   IMAGE ZOOM
+========================= */
+
+document
+.querySelectorAll(".zoomable")
+.forEach(img => {
+
+    img.addEventListener("click", function() {
+
+        document
+        .getElementById("imageModal")
+        .style.display = "block";
+
+
+        document
+        .getElementById("modalImage")
+        .src = this.src;
+
+    });
+
+});
+
+
+/* =========================
+   CLOSE IMAGE MODAL
+========================= */
+
+document
+.querySelector(".close-modal")
+.addEventListener("click", function() {
+
+    document
+    .getElementById("imageModal")
+    .style.display = "none";
+
+});
+
+
+</script>
+
+
+</body>
 </html>
